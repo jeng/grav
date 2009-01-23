@@ -42,7 +42,7 @@ class Planet{
     color  colors;
     int radius;
 
-    Planet(int x, int y, int width, int height){
+    Planet(){
 
         POS = new float[DIMENSIONS];
         VEL = new float[DIMENSIONS];
@@ -51,8 +51,8 @@ class Planet{
         colors = color(random(0xff), random(0xff), random(0xff));
 
         /* Initialize positions */
-        POS[X] = x;
-        POS[Y] = y;
+        POS[X] = FLOATRAND(-XR, XR);
+        POS[Y] = FLOATRAND(-YR, YR);
         POS[Z] = FLOATRAND(-ZR, ZR);
 
         if (POS[Z] > -ALMOST) {
@@ -144,11 +144,8 @@ class Grav {
 
     }
 
-    void addPlanet(int x, int y){
-        x = x - width/2;
-        y = y - height/2;
-        planets.add(new Planet(x ,y,width,height));
-        print("Planet added at " + x + " " + y + " new size is "  + planets.size() + "\n");
+    void addPlanet(){
+        planets.add(new Planet());
     }
 
     void draw(){
@@ -177,18 +174,48 @@ Grav grav;
 
 float FLOATRAND(float min, float max){ return random(min, max); }
 
-void mousePressed(){
-    grav.addPlanet(mouseX, mouseY);
+class PlanetCreator implements ClickEvent{
+    void onClick(Object tag){
+        grav.addPlanet();
+    }
 }
+
+void mouseMoved(){
+  for(int i = 0; i < controls.length; i++)
+    controls[i].onMove();
+}
+
+void mousePressed(){
+  for(int i = 0; i < controls.length; i++)
+    controls[i].onClick(new Integer(i));
+}
+
+void mouseDragged(){
+  for(int i = 0; i < controls.length; i++)
+    controls[i].onDrag();
+}
+
+GuiElement [] controls;
+GuiFont font;
 
 void setup(){
     size(800,600);
     grav = new Grav(800,600);
     print("yes");
+
+    controls = new GuiElement[2];
+    font = new GuiFont(loadFont("ScalaSans-Caps-32.vlw"), color(0x0, 0x0, 0x0), 32);
+    controls[0] = new Button("New Planet", new Pos( 50, 550), new PlanetCreator(), font, color(0xFF, 0x81, 0x03));
+    controls[1] = new Slider(300,550,360,20,0,color(0xFF, 0x81, 0x03, 200));
 }
 
 void draw(){
-    background(0);
+    background(color(0x20,0x20,0x20));
+    int val = (Slider)controls[1].getValue();
+    GRAV = (val/2)/1000
     grav.draw();
+    for (int i = 0; i < controls.length; i++){
+        controls[i].draw();
+    }
 }
 
