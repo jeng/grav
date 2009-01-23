@@ -40,6 +40,7 @@ class Planet{
     float POS[], VEL[], ACC[];
     int    xi, yi, ri;
     color  colors;
+    int radius;
 
     Planet(int width, int height, float ir){
 
@@ -68,12 +69,11 @@ class Planet{
         VEL[Y] = FLOATRAND(-VR, VR);
         VEL[Z] = FLOATRAND(-VR, VR);
 
-        /* Draw planets */
-        this.draw();
+        radius = round(FLOATRAND(10,50));//round(ir / POS[Z] + DIST);
 
     }
 
-    void draw(){
+    void draw(Grav gp){
         float      D;          /* A distance variable to work with */
         int cmpt;
 
@@ -99,26 +99,27 @@ class Planet{
             POS[cmpt] = POS[cmpt] + VEL[cmpt];
         }
 
-        grav.x = xi;
-        grav.y = yi;
+        gp.x = xi;
+        gp.y = yi;
 
         if (POS[Z] > -ALMOST) {
             xi = (int)
-                ((float) grav.width * (HALF + POS[X] / (POS[Z] + DIST)));
+                ((float) gp.width * (HALF + POS[X] / (POS[Z] + DIST)));
             yi = (int)
-                ((float) grav.height * (HALF + POS[Y] / (POS[Z] + DIST)));
+                ((float) gp.height * (HALF + POS[Y] / (POS[Z] + DIST)));
         } else
             xi = yi = -1;
 
         /* Move */
-        grav.x = xi;
-        grav.y = yi;
-        ri = round(grav.INTRINSIC_RADIUS / POS[Z] + DIST);
+        gp.x = xi;
+        gp.y = yi;
+        ri = radius;
 
         /* Redraw */
+        stroke(colors);
         fill(colors);
-        if (xi >= 0 && yi >= 0 && xi <= grav.width && yi <= grav.height)
-            ellipse(xi,yi,xi + (2 * ri), yi + (2 * ri));
+        if (xi >= 0 && yi >= 0 && xi <= gp.width && yi <= gp.height)
+            ellipse(xi - ri / 2, yi - ri / 2, ri, ri);
     }
 
 }
@@ -164,7 +165,7 @@ class Grav {
         ellipse(width / 2 - sr / 2, height / 2 - sr / 2, sr, sr);
 
         for (int ball = 0; ball < nplanets; ball++)
-            planets[ball].draw();
+            planets[ball].draw(this);
     }
 }
 
@@ -174,12 +175,12 @@ float FLOATRAND(float min, float max){ return random(min, max); }
 
 void setup(){
     size(800,600);
-    grav = new Grav(800,600,10);
+    grav = new Grav(800,600,20);
     print("yes");
 }
 
 void draw(){
     background(0);
-    //grav.draw();
+    grav.draw();
 }
 
