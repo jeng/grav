@@ -42,7 +42,7 @@ class Planet{
     color  colors;
     int radius;
 
-    Planet(int width, int height, float ir){
+    Planet(int x, int y, int width, int height){
 
         POS = new float[DIMENSIONS];
         VEL = new float[DIMENSIONS];
@@ -51,8 +51,8 @@ class Planet{
         colors = color(random(0xff), random(0xff), random(0xff));
 
         /* Initialize positions */
-        POS[X] = FLOATRAND(-XR, XR);
-        POS[Y] = FLOATRAND(-YR, YR);
+        POS[X] = x;
+        POS[Y] = y;
         POS[Z] = FLOATRAND(-ZR, ZR);
 
         if (POS[Z] > -ALMOST) {
@@ -62,7 +62,6 @@ class Planet{
                 ((float) height * (HALF + POS[Y] / (POS[Z] + DIST)));
         } else
             xi = yi = -1;
-        ri = round(ir / POS[Z] + DIST);
 
         /* Initialize velocities */
         VEL[X] = FLOATRAND(-VR, VR);
@@ -126,27 +125,30 @@ class Planet{
 
 class Grav {
     int         width, height;
-    int         x, y, sr, nplanets;
+    int         x, y, sr;
     color starcolor;
-    Planet planets[];
+    ArrayList planets;
     int STARRADIUS;
     float INTRINSIC_RADIUS;
 
-    Grav(int w, int h, int np){
+    Grav(int w, int h){
         width = w;
         height = h;
         INTRINSIC_RADIUS = height/5;
         STARRADIUS = round(height/(2*DIST));
         sr = STARRADIUS;
 
-        nplanets = np;
-
-        planets = new Planet[nplanets];
+        planets = new ArrayList();
 
         starcolor = color(random(0xff), random(0xff), random(0xff));
 
-        for(int ball = 0; ball < nplanets; ball++)
-            planets[ball] = new Planet(width, height, INTRINSIC_RADIUS );
+    }
+
+    void addPlanet(int x, int y){
+        x = x - width/2;
+        y = y - height/2;
+        planets.add(new Planet(x ,y,width,height));
+        print("Planet added at " + x + " " + y + " new size is "  + planets.size() + "\n");
     }
 
     void draw(){
@@ -164,8 +166,10 @@ class Grav {
         fill(starcolor);
         ellipse(width / 2 - sr / 2, height / 2 - sr / 2, sr, sr);
 
-        for (int ball = 0; ball < nplanets; ball++)
-            planets[ball].draw(this);
+        for (int ball = 0; ball < planets.size(); ball++){
+            Planet p = (Planet)planets.get(ball);
+            p.draw(this);
+        }
     }
 }
 
@@ -173,9 +177,13 @@ Grav grav;
 
 float FLOATRAND(float min, float max){ return random(min, max); }
 
+void mousePressed(){
+    grav.addPlanet(mouseX, mouseY);
+}
+
 void setup(){
     size(800,600);
-    grav = new Grav(800,600,20);
+    grav = new Grav(800,600);
     print("yes");
 }
 
