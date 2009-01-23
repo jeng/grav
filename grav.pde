@@ -11,7 +11,7 @@ final boolean DEF_TRAIL = true;   /* For trails (works good in mono only) */
 static boolean decay;
 static boolean trail;
 
-final float GRAV    =  -0.02;  /* Gravitational constant */
+      float GRAV    =  -0.02;  /* Gravitational constant */
 final float DIST    =  16.0;
 final float COLLIDE =   0.0001;
 final float ALMOST  =  15.99;
@@ -205,14 +205,16 @@ void setup(){
 
     controls = new GuiElement[2];
     font = new GuiFont(loadFont("ScalaSans-Caps-32.vlw"), color(0x0, 0x0, 0x0), 32);
-    controls[0] = new Button("New Planet", new Pos( 50, 550), new PlanetCreator(), font, color(0xFF, 0x81, 0x03));
-    controls[1] = new Slider(300,550,360,20,0,color(0xFF, 0x81, 0x03, 200));
+    controls[0] = new Button("New Planet", new Pos( 50, 550), new PlanetCreator(), font, color(0x60, 0x60, 0x60));
+    controls[1] = new Slider(300,550,360,20,0,color(0x60, 0x60, 0x60, 200));
 }
 
 void draw(){
-    background(color(0x20,0x20,0x20));
-    int val = (Slider)controls[1].getValue();
-    GRAV = (val/2)/1000
+    background(color(0xaa,0xaa,0xaa));
+    Slider s = (Slider)controls[1];
+    float val = s.getValue();
+    GRAV = -((val/2.0)/1000.0);
+    print("grav: " + GRAV + "\n");
     grav.draw();
     for (int i = 0; i < controls.length; i++){
         controls[i].draw();
